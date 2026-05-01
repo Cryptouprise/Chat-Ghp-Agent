@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>SEO OS</title>
+<style>body{font-family:Arial;background:#050816;color:#e7ecff}.wrap{max-width:1200px;margin:20px auto}.card{background:#0f172a;border:1px solid #243041;border-radius:12px;padding:16px;margin-bottom:12px}input,textarea{width:100%;margin:6px 0;padding:10px;background:#020617;color:#fff;border:1px solid #334155;border-radius:8px}button{background:#22c55e;border:0;border-radius:8px;padding:10px 14px;font-weight:700;margin-right:8px}.hidden{display:none}</style></head>
+<body><div class='wrap'><h1>🚀 SEO OS</h1><div class='card'><button onclick="show('live')">Live URL</button><button onclick="show('html')">Paste HTML</button><button onclick="runDemo()">Instant Demo Report</button></div>
+<div id='live' class='card'><input id='url' placeholder='https://example.com'><input id='geo' placeholder='Austin, Texas'><button onclick='runLive()'>Run Live</button></div>
+<div id='html' class='card hidden'><input id='base' value='https://example.com'><textarea id='html_input' rows='10' placeholder='<html>...</html>'></textarea><input id='geo2' placeholder='Austin, Texas'><button onclick='runHtml()'>Run HTML</button></div>
+<div id='out'></div></div>
+<script>
+function show(id){document.getElementById('live').classList.toggle('hidden',id!=='live');document.getElementById('html').classList.toggle('hidden',id!=='html')}
+function render(d){const a=d.audit;const checks=Object.entries(a.checks).map(([k,v])=>`<li>${v?'✅':'❌'} ${k}</li>`).join('');const actions=d.actions.map(x=>`<li><b>[${x.priority}] ${x.area}</b> ${x.action}</li>`).join('');out.innerHTML=`<div class='card'><h2>Score: ${a.score}/100</h2><p>Title len: ${a.title_length} | Meta len: ${a.meta_description_length}</p><ul>${checks}</ul><h3>Actions</h3><ul>${actions}</ul></div>`}
+async function runDemo(){const r=await fetch('/demo_report');render(await r.json())}
+async function runLive(){const r=await fetch('/audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url.value,geo_terms:geo.value.split(',')})});const d=await r.json();if(!r.ok){out.innerHTML=`<div class='card'>${d.error}</div>`;return;}render(d)}
+async function runHtml(){const r=await fetch('/audit_html',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base_url:base.value,html:html_input.value,geo_terms:geo2.value.split(',')})});const d=await r.json();if(!r.ok){out.innerHTML=`<div class='card'>${d.error}</div>`;return;}render(d)}
+</script></body></html>
